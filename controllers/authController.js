@@ -7,6 +7,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
 const axios = require("axios");
+const { json } = require("express");
 
 const signToken = (id) =>
   jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -58,7 +59,7 @@ exports.signup = catchAsync(async (req, res, next) => {
       }
     );
   } catch (err) {
-    return next(new AppError("User already exists", 400)); //check this implementation
+    return next(new AppError("User already exists", 409)); //check this implementation
   }
 
   // console.log(response.data);
@@ -74,6 +75,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     country: req.body.country,
     walletId: accountReference,
   });
+
+  // i can still bring out some other details from the response.data so the user can be created alongside those properties such as wallet account number and bank etc
 
   const url = `${req.protocol}://${req.get("host")}/me`;
 
@@ -225,13 +228,13 @@ exports.verify = catchAsync(async (req, res, next) => {
   const { role } = req.user;
 
   // Check if the user role is 'rider' or 'company'
-  if (role === "rider" && !bvn) {
-    return next(new AppError("Please provide a BVN for verification", 400));
-  } else if (role === "company" && (!bvn || !cac)) {
-    return next(
-      new AppError("Please provide both BVN and CAC for verification", 400)
-    );
-  }
+  // if (role === "rider" && !bvn) {
+  //   return next(new AppError("Please provide a BVN for verification", 400));
+  // } else if (role === "company" && (!bvn || !cac)) {
+  //   return next(
+  //     new AppError("Please provide both BVN and CAC for verification", 400)
+  //   );
+  // }
 
   // Verify the user's account based on their role and provided details
   // Implement your verification logic here
@@ -245,3 +248,33 @@ exports.verify = catchAsync(async (req, res, next) => {
     message: "Account verification successful!",
   });
 });
+
+exports.verifyCac = catchAsync(async (req, res, next) => {
+  const company = await User.findById(req.params.id);
+
+  if (company.role !== "company") {
+    return next(
+      new AppError("this is not user with the provided id isnt a company", 400)
+    );
+  }
+
+  const updatedCompany = await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      isVerified: true,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: updatedCompany,
+    },
+  });
+});
+
+// only update if user isnt yet verified

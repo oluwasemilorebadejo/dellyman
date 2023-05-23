@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
   active: {
     type: Boolean,
-    default: true,
+    default: false,
     select: false,
   },
   walletId: {
@@ -59,7 +59,13 @@ const userSchema = new mongoose.Schema({
     required: [true, "pls enter your country code"],
     enum: ["NG", "GH"],
   },
+  otp: {
+    type: String,
+    required: true,
+  },
 });
+
+// once user verifies otp, set active to true
 
 userSchema.pre("save", async function (next) {
   // function runs only if password is modified
