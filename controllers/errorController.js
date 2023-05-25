@@ -50,20 +50,6 @@ const sendErrorProd = (err, req, res) => {
       message: "something went wrong",
     });
   }
-  // (B) SSRendered
-  if (err.isOperational) {
-    return res.status(err.statusCode).render("error", {
-      title: "Something went wrong",
-      msg: err.message,
-    });
-  }
-  // programming errors, dont send details to client
-  console.error("ERROR", err);
-
-  return res.status(err.statusCode).render("error", {
-    title: "Something went wrong",
-    msg: "pls try again later",
-  });
 };
 
 module.exports = (err, req, res, next) => {
