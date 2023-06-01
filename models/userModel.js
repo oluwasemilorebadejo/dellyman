@@ -21,10 +21,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: {
-      values: ["company", "rider"],
-      message: "User role not allowed. Role must be company or rider",
-    },
+    enum: ["company", "rider", "admin"],
   },
   password: {
     type: String,
@@ -47,13 +44,8 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
   active: {
     type: Boolean,
-    default: true,
-    select: false,
-  },
-  verifiedOTP: {
-    type: Boolean,
     default: false,
-    // select: false,
+    select: false,
   },
   walletId: {
     type: String,
@@ -69,9 +61,7 @@ const userSchema = new mongoose.Schema({
   },
   otp: {
     type: String,
-  },
-  otpReference: {
-    type: String,
+    required: true,
   },
 });
 

@@ -10,15 +10,13 @@ router.post("/login", authController.login);
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
 
-router.post("/verifyOTP", authController.verifyOTP);
-
 router.use(authController.protect); // applies protect middleware to routes defined after this
+
+router.post("/verify", authController.verify);
 
 router.use(authController.restrictTo("admin"));
 
 router.route("/").get(userController.getAllUsers);
-
-router.post("/verify", authController.verify);
 
 router
   .route("/:id")

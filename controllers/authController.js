@@ -39,28 +39,28 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  // const accountReference = uuidv4().replace(/-/g, "").slice(0, 20);
+  const accountReference = uuidv4().replace(/-/g, "").slice(0, 20);
 
   // console.log(accountReference);
-  // try {
-  //   const response = await axios.post(
-  //     "https://api.flutterwave.com/v3/payout-subaccounts",
-  //     {
-  //       account_name: req.body.fullName,
-  //       email: req.body.email,
-  //       mobilenumber: req.body.phone,
-  //       country: req.body.country,
-  //       account_reference: accountReference,
-  //     },
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-  //       },
-  //     }
-  //   );
-  // } catch (err) {
-  //   return next(new AppError("User already exists", 409)); //check this implementation
-  // }
+  try {
+    const response = await axios.post(
+      "https://api.flutterwave.com/v3/payout-subaccounts",
+      {
+        account_name: req.body.fullName,
+        email: req.body.email,
+        mobilenumber: req.body.phone,
+        country: req.body.country,
+        account_reference: accountReference,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+        },
+      }
+    );
+  } catch (err) {
+    return next(new AppError("User already exists", 409)); //check this implementation
+  }
 
   // console.log(response.data);
 
@@ -73,59 +73,16 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordChangedAt: req.body.passwordChangedAt,
     role: req.body.role,
     country: req.body.country,
-    // walletId: accountReference,
+    walletId: accountReference,
   });
 
   // i can still bring out some other details from the response.data so the user can be created alongside those properties such as wallet account number and bank etc
 
-  // send OTP
-  const data = JSON.stringify({
-    length: 7,
-    customer: {
-      name: newUser.fullName,
-      email: newUser.email,
-      phone: newUser.phone,
-    },
-    sender: "blac",
-    send: true,
-    medium: ["whatsapp", "email"],
-    expiry: 5,
-  });
+  const url = `${req.protocol}://${req.get("host")}/me`;
 
-  const config = {
-    method: "POST",
-    url: "https://api.flutterwave.com/v3/otps",
-    headers: {
-      Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-      "Content-Type": "application/json",
-    },
-    data: data,
-  };
+  // await new Email(newUser, url).sendWelcome();
 
-  try {
-    const response = await axios(config);
-
-    const otpData = response.data.data;
-    const smsOtpData = otpData.find((item) => item.medium === "email");
-
-    const otpReference = smsOtpData.reference;
-    const otp = smsOtpData.otp;
-
-    newUser.otp = otp;
-    newUser.otpReference = otpReference;
-
-    await newUser.save({ validateBeforeSave: false });
-  } catch (error) {
-    console.log(error);
-    return next(new AppError("Error generating OTP. Please try again", 500));
-  }
-
-  res.status(201).json({
-    status: "success",
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -138,13 +95,6 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // check if user exists and password is correct
   const user = await User.findOne({ email }).select("+password"); // { email: email }
-
-  if (user && user.verifiedOTP === false) {
-    return next(
-      new AppError("kindly verify your account before logging in", 400)
-    );
-    // THEN REDIRECT THEM TO GET OTP
-  }
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("incorrect email or password", 401));
@@ -327,106 +277,4 @@ exports.verifyCac = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.generateOTP = catchAsync(async (req, res, next) => {
-  // send OTP
-  const data = JSON.stringify({
-    length: 7,
-    customer: {
-      name: newUser.fullName,
-      email: newUser.email,
-      phone: newUser.phone,
-    },
-    sender: "blac",
-    send: true,
-    medium: ["sms", "email"],
-    expiry: 5,
-  });
-
-  const config = {
-    method: "POST",
-    url: "https://api.flutterwave.com/v3/otps",
-    headers: {
-      Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-      "Content-Type": "application/json",
-    },
-    data: data,
-  };
-
-  try {
-    const response = await axios(config);
-    console.log(response.data);
-
-    const otpData = response.data.data;
-    const smsOtpData = otpData.find((item) => item.medium === "email");
-
-    // if (!smsOtpData) {
-    //   return next(new AppError("Error generating OTP. Please try again", 500));
-    // }
-
-    const otpReference = smsOtpData.reference;
-    const otp = smsOtpData.otp;
-
-    newUser.otp = otp;
-    newUser.otpReference = otpReference;
-
-    await newUser.save({ validateBeforeSave: false });
-  } catch (error) {
-    console.error(error);
-    return next(new AppError("Error generating OTP. Please try again", 500));
-  }
-
-  next();
-});
-
-exports.verifyOTP = catchAsync(async (req, res, next) => {
-  const { otp } = req.body;
-
-  const currentUser = await User.findOne({ otp });
-
-  if (!currentUser) {
-    return next(new AppError("invalid otp", 400));
-  }
-
-  if (currentUser.verifiedOTP) {
-    return next(new AppError("account already verified, kindly login", 400));
-  }
-
-  const otpReference = currentUser.otpReference;
-
-  try {
-    const data = JSON.stringify({
-      otp,
-    });
-
-    const config = {
-      method: "post",
-      url: `https://api.flutterwave.com/v3/otps/${otpReference}/validate`,
-      headers: {
-        Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-        "Content-Type": "application/json",
-      },
-      data: data,
-    };
-
-    const response = await axios(config);
-
-    if (response.data.status === "success") {
-      currentUser.verifiedOTP = true;
-      currentUser.otp = undefined;
-
-      await currentUser.save({ validateBeforeSave: false });
-    } else {
-      return next(new AppError("invalid otp", 400));
-    }
-
-    res.status(201).json({
-      status: "success",
-      data: {
-        message: "your account has been verified. you can now login",
-      },
-    });
-  } catch (error) {
-    console.log(error);
-    return next(new AppError("something went wrong. pls try again"));
-  }
-});
+// only update if user isnt yet verified
