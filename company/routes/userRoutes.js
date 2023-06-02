@@ -1,6 +1,7 @@
 const express = require("express");
 const userController = require("../controllers/userController");
 const authController = require("../controllers/authController");
+const subscriptionController = require("../controllers/subscriptionController");
 
 const router = express.Router();
 
@@ -16,7 +17,13 @@ router.use(authController.protect); // applies protect middleware to routes defi
 
 router.post("/verify", authController.verify);
 
+router.route("/plan").get(subscriptionController.getAllPlans);
+
+router.route("/plan/:id").get(subscriptionController.getPlan);
+
 router.use(authController.restrictTo("admin"));
+
+router.post("/plan", subscriptionController.createPlan);
 
 router.route("/").get(userController.getAllUsers);
 

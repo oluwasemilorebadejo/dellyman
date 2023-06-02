@@ -308,37 +308,37 @@ exports.verifyCac = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (company.isVerified === true) {
-    const accountReference = uuidv4().replace(/-/g, "").slice(0, 20);
+  // if (company.isVerified === true) {
+  //   const accountReference = uuidv4().replace(/-/g, "").slice(0, 20);
 
-    try {
-      const response = await axios.post(
-        "https://api.flutterwave.com/v3/payout-subaccounts",
-        {
-          account_name: company.name,
-          email: company.email,
-          mobilenumber: company.phone,
-          country: company.country,
-          account_reference: accountReference,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-          },
-        }
-      );
+  //   try {
+  //     const response = await axios.post(
+  //       "https://api.flutterwave.com/v3/payout-subaccounts",
+  //       {
+  //         account_name: company.name,
+  //         email: company.email,
+  //         mobilenumber: company.phone,
+  //         country: company.country,
+  //         account_reference: accountReference,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+  //         },
+  //       }
+  //     );
 
-      // console.log(response.data.data);
+  //     // console.log(response.data.data);
 
-      company.walletId = accountReference;
-      company.wallet = response.data.data.nuban;
-      company.bank = response.data.data.bank_name;
-      await company.save({ validateBeforeSave: false });
-    } catch (err) {
-      console.error(err);
-      return next(new AppError("Error Creating account. pls try again", 500));
-    }
-  }
+  //     company.walletId = accountReference;
+  //     company.wallet = response.data.data.nuban;
+  //     company.bank = response.data.data.bank_name;
+  //     await company.save({ validateBeforeSave: false });
+  //   } catch (err) {
+  //     console.error(err);
+  //     return next(new AppError("Error Creating account. pls try again", 500));
+  //   }
+  // }
 
   res.status(200).json({
     status: "success",
