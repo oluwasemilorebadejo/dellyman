@@ -6,25 +6,42 @@ const jobSchema = new mongoose.Schema({
     ref: "Company",
     required: true,
   },
-  title: {
+  role: {
     type: String,
-    required: true,
+    // required: true,
+    enum: ["rider"],
+    message: "Role not allowed. Role must be rider",
+  },
+  level: {
+    type: String,
+  },
+  minimunQualification: {
+    type: String,
   },
   description: {
     type: String,
-    required: true,
+    // required: true,
+  },
+  summary: {
+    type: String,
   },
   requirements: {
     type: [String],
-    required: true,
+    // required: true,
+  },
+  ageRange: {
+    type: String,
   },
   location: {
     type: String,
-    required: true,
+    // required: true,
+  },
+  experience: {
+    type: String,
   },
   salary: {
     type: Number,
-    required: true,
+    // required: true,
   },
   createdAt: {
     type: Date,
