@@ -97,6 +97,7 @@ const companySchema = new mongoose.Schema({
     type: String,
     enum: ["free", "basic", "premium"],
     default: "free",
+    message: "Plan not allowed. Plan must be free, basic or premium",
   },
 });
 
