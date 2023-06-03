@@ -51,4 +51,48 @@ exports.createPlan = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.getPlan = catchAsync(async (req, res, next) => {});
+exports.deletePlan = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const options = {
+    method: "PUT",
+    url: `https://api.flutterwave.com/v3/payment-plans/${id}/cancel`,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+    },
+  };
+
+  axios(options)
+    .then((response) => {
+      res.status(200).json({
+        plan: response.data,
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+
+exports.getPlan = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const options = {
+    method: "GET",
+    url: `https://api.flutterwave.com/v3/payment-plans/${id}`,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+    },
+  };
+
+  axios(options)
+    .then((response) => {
+      res.status(200).json({
+        plan: response.data,
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});

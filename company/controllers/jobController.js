@@ -30,8 +30,6 @@ exports.createJob = catchAsync(async (req, res, next) => {
   });
 });
 
-// exports.getMyJobs = catchAsync(async (req, res, next) => {});
-
 exports.getMyJobs = catchAsync(async (req, res, next) => {
   const companyId = req.user.id; // Assuming the authenticated user has a "company" property that holds the reference to the company
 
@@ -41,6 +39,84 @@ exports.getMyJobs = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       jobs,
+    },
+  });
+});
+
+exports.getAllJobs = catchAsync(async (req, res, next) => {
+  const jobs = await Job.find();
+
+  res.status(200).json({
+    status: "success",
+    number: jobs.length,
+    data: {
+      jobs,
+    },
+  });
+});
+
+exports.updateJob = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { description, requirements, location, salary } = req.body;
+
+  const job = await Job.findById(id);
+
+  if (!job) {
+    return next(new AppError("Job not found", 404));
+  }
+
+  if (job.company.toString() !== req.user.id) {
+    return next(new AppError("You are not authorized to update this job", 403));
+  }
+
+  const updatedJob = await Job.findByIdAndUpdate(
+    id,
+    { description, requirements, location, salary },
+    { new: true, runValidators: true }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      job: updatedJob,
+    },
+  });
+});
+
+exports.deleteJob = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const job = await Job.findById(id);
+
+  if (!job) {
+    return next(new AppError("Job not found", 404));
+  }
+
+  if (job.company.toString() !== req.user.id) {
+    return next(new AppError("You are not authorized to delete this job", 403));
+  }
+
+  await Job.findByIdAndDelete(id);
+
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
+});
+
+exports.getJob = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const job = await Job.findById(id);
+
+  if (!job) {
+    return next(new AppError("Job not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      job,
     },
   });
 });

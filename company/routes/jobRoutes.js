@@ -12,9 +12,14 @@ router.use(protect);
 
 router.use(restrictTo("company"));
 
+router.route("/").post(setCompanyId, jobController.createJob);
+
 router
-  .route("/")
-  .post(setCompanyId, jobController.createJob)
-  .get(jobController.getMyJobs);
+  .route("/:id")
+  .get(jobController.getJob)
+  .patch(jobController.updateJob)
+  .delete(jobController.deleteJob);
+
+router.get("/my-jobs", jobController.getMyJobs);
 
 module.exports = router;

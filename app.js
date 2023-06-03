@@ -9,6 +9,7 @@ const globalErrorHandler = require("./utils/errorController");
 
 const companyRouter = require("./company/routes/userRoutes");
 const jobRouter = require("./company/routes/jobRoutes");
+const adminRouter = require("./admin/adminRoutes");
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use(mongoSanitize());
 
 app.use("/api/v1/users/company", companyRouter);
 app.use("/api/v1/jobs", jobRouter);
+app.use("/api/v1/admin", adminRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`cant find ${req.originalUrl}`, 404));

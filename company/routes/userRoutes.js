@@ -18,23 +18,8 @@ router.use(protect); // applies protect middleware to routes defined after this
 
 router.post("/verify", authController.verify);
 
-router.route("/plan").get(subscriptionController.getAllPlans);
-
-router.route("/plan/:id").get(subscriptionController.getPlan);
+// router.route("/plan/:id").get(subscriptionController.getPlan);
 
 router.use(restrictTo("admin"));
-
-router.post("/plan", subscriptionController.createPlan);
-
-router.route("/").get(userController.getAllUsers);
-
-router
-  .route("/:id")
-  .get(userController.getUser)
-  .delete(userController.deleteUser);
-
-router.patch("/verify-cac/:id", authController.verifyCac);
-
-// test deleted user and make sure they cant login after, also verify the companies by cac
 
 module.exports = router;
