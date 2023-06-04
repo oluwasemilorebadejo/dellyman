@@ -2,7 +2,7 @@
 
 ### Sign Up
 
--   Endpoint: `/signup`
+-   Endpoint: `users/company/signup`
 -   Method: `POST`
 -   Description: Creates a new user account.
 -   Request Body:
@@ -17,7 +17,7 @@
 
 ### Login
 
--   Endpoint: `/login`
+-   Endpoint: `users/company/login`
 -   Method: `POST`
 -   Description: Authenticates a user and generates a JSON web token (JWT) for authorization.
 -   Request Body:
@@ -26,7 +26,7 @@
 
 ### Forgot Password
 
--   Endpoint: `/forgotPassword`
+-   Endpoint: `users/company/forgotPassword`
 -   Method: `POST`
 -   Description: Sends a password reset token to the user's email address.
 -   Request Body:
@@ -34,7 +34,7 @@
 
 ### Reset Password
 
--   Endpoint: `/resetPassword/:token`
+-   Endpoint: `users/company/resetPassword/:token`
 -   Method: `PATCH`
 -   Description: Resets the user's password using the provided password reset token.
 -   Request Parameters:
@@ -45,7 +45,7 @@
 
 ### Verify OTP
 
--   Endpoint: `/verifyOTP`
+-   Endpoint: `/users/companyverifyOTP`
 -   Method: `POST`
 -   Description: Verifies the user's account using a one-time password (OTP) sent via email.
 -   Request Body:
@@ -53,7 +53,7 @@
 
 ### Verify Account
 
--   Endpoint: `/verify`
+-   Endpoint: `users/company/verify`
 -   Method: `POST`
 -   Description: Verifies the user's account based on their role and provided details.
 -   Request Body:
@@ -74,7 +74,7 @@
 
 ### Create Job
 
--   Endpoint: `/`
+-   Endpoint: `jobs/`
 -   Method: `POST`
 -   Description: Creates a new job for a company.
 -   Request Body:
@@ -82,7 +82,7 @@
 
 ### Get Job
 
--   Endpoint: `/:id`
+-   Endpoint: `jobs/:id`
 -   Method: `GET`
 -   Description: Retrieves a specific job by ID.
 -   Request Parameters:
@@ -90,7 +90,7 @@
 
 ### Update Job
 
--   Endpoint: `/:id`
+-   Endpoint: `jobs/:id`
 -   Method: `PATCH`
 -   Description: Updates a specific job by ID.
 -   Request Parameters:
@@ -100,7 +100,7 @@
 
 ### Delete Job
 
--   Endpoint: `/:id`
+-   Endpoint: `jobs/:id`
 -   Method: `DELETE`
 -   Description: Deletes a specific job by ID.
 -   Request Parameters:
