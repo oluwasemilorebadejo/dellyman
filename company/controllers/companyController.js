@@ -1,4 +1,4 @@
-const User = require("../models/userModel");
+const User = require("../models/companyModel");
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../../utils/appError");
 
@@ -12,6 +12,13 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
       users,
     },
   });
+});
+
+exports.getMe = catchAsync(async (req, res, next) => {
+  // sets id so it can be used by /me route to set id to current user id
+  req.params.id = req.user.id;
+
+  next();
 });
 
 exports.getUser = catchAsync(async (req, res, next) => {

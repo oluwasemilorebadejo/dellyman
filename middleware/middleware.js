@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
-const User = require("../company/models/userModel");
+const User = require("../company/models/companyModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 

@@ -3,7 +3,7 @@ const express = require("express");
 const { protect, restrictTo } = require("../middleware/middleware");
 const jobController = require("../company/controllers/jobController");
 const subscriptionController = require("../company/controllers/subscriptionController");
-const companyController = require("../company/controllers/userController");
+const companyController = require("../company/controllers/companyController");
 const authController = require("../company/controllers/authController");
 
 const router = express.Router();

@@ -99,6 +99,10 @@ const companySchema = new mongoose.Schema({
     default: "free",
     message: "Plan not allowed. Plan must be free, basic or premium",
   },
+  points: {
+    type: Number,
+    default: 0,
+  },
 });
 
 // once Company verifies otp, set active to true

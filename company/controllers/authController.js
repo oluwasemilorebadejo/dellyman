@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
+const User = require("../models/companyModel");
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../../utils/appError");
 const sendEmail = require("../../utils/email");
@@ -197,15 +197,13 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, req, res);
 });
 
-exports.verify = catchAsync(async (req, res, next) => {
-  const { bvn, cac } = req.body;
+exports.verifyBvn = catchAsync(async (req, res, next) => {
+  const { bvn } = req.body;
   const { role } = req.user;
 
   // Check if the user role is 'rider' or 'company'
-  if (role === "company" && (!bvn || !cac)) {
-    return next(
-      new AppError("Please provide a BVN and CAC for verification", 400)
-    );
+  if (role === "company" && !bvn) {
+    return next(new AppError("Please provide a BVN for verification", 400));
   }
 
   // Verify the user's account based on their role and provided details
@@ -217,7 +215,22 @@ exports.verify = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    message: "Account verification pending, kindly check back for updates",
+    message: "BVN verification pending, kindly check back for updates",
+    user: req.user,
+  });
+});
+
+exports.uploadCac = catchAsync(async (req, res, next) => {
+  const { cac } = req.body;
+  const { role } = req.user;
+
+  if (role === "company" && !cac) {
+    return next(new AppError("Please provide CAC for verification", 400));
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "CAC document uploaded, kindly check back for updates",
     user: req.user,
   });
 });

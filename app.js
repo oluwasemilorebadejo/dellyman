@@ -7,7 +7,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./utils/errorController");
 
-const companyRouter = require("./company/routes/userRoutes");
+const companyRouter = require("./company/routes/companyRoutes");
 const jobRouter = require("./company/routes/jobRoutes");
 const adminRouter = require("./admin/adminRoutes");
 

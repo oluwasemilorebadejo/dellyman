@@ -1,8 +1,9 @@
 const express = require("express");
-const userController = require("../controllers/userController");
+const companyController = require("../controllers/companyController");
 const authController = require("../controllers/authController");
 const { protect, restrictTo } = require("../../middleware/middleware");
 const subscriptionController = require("../controllers/subscriptionController");
+const riderController = require("../../rider/controllers/riderController");
 
 const router = express.Router();
 
@@ -16,9 +17,21 @@ router.post("/verifyOTP", authController.verifyOTP);
 
 router.use(protect); // applies protect middleware to routes defined after this
 
-router.post("/verify", authController.verify);
+router.post("/verify-bvn", authController.verifyBvn);
+router.post("/upload-cac", authController.uploadCac);
 
-// router.route("/plan/:id").get(subscriptionController.getPlan);
+router
+  .route("/rider")
+  .post(riderController.addRider)
+  .get(riderController.getMyRiders);
+
+router.get("/plans", subscriptionController.getAllPlans);
+
+router.post("/plans/basic", subscriptionController.basicPlan);
+
+router.post("/plans/premium", subscriptionController.premiumPlan);
+
+router.get("/me", companyController.getMe, companyController.getUser);
 
 router.use(restrictTo("admin"));
 
