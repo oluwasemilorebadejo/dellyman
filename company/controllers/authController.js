@@ -53,46 +53,46 @@ exports.signup = catchAsync(async (req, res, next) => {
   // i can still bring out some other details from the response.data so the user can be created alongside those properties such as wallet account number and bank etc
 
   // send OTP
-  // const data = JSON.stringify({
-  //   length: 7,
-  //   customer: {
-  //     name: newUser.name,
-  //     email: newUser.email,
-  //     phone: newUser.phone,
-  //   },
-  //   sender: "blac",
-  //   send: true,
-  //   medium: ["whatsapp", "email"],
-  //   expiry: 5,
-  // });
+  const data = JSON.stringify({
+    length: 7,
+    customer: {
+      name: newUser.name,
+      email: newUser.email,
+      phone: newUser.phone,
+    },
+    sender: "blac",
+    send: true,
+    medium: ["whatsapp", "email"],
+    expiry: 5,
+  });
 
-  // const config = {
-  //   method: "POST",
-  //   url: "https://api.flutterwave.com/v3/otps",
-  //   headers: {
-  //     Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-  //     "Content-Type": "application/json",
-  //   },
-  //   data: data,
-  // };
+  const config = {
+    method: "POST",
+    url: "https://api.flutterwave.com/v3/otps",
+    headers: {
+      Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+      "Content-Type": "application/json",
+    },
+    data: data,
+  };
 
-  // try {
-  //   const response = await axios(config);
+  try {
+    const response = await axios(config);
 
-  //   const otpData = response.data.data;
-  //   const smsOtpData = otpData.find((item) => item.medium === "email");
+    const otpData = response.data.data;
+    const smsOtpData = otpData.find((item) => item.medium === "email");
 
-  //   const otpReference = smsOtpData.reference;
-  //   const otp = smsOtpData.otp;
+    const otpReference = smsOtpData.reference;
+    const otp = smsOtpData.otp;
 
-  //   newUser.otp = otp;
-  //   newUser.otpReference = otpReference;
+    newUser.otp = otp;
+    newUser.otpReference = otpReference;
 
-  //   await newUser.save({ validateBeforeSave: false });
-  // } catch (error) {
-  //   console.log(error);
-  //   return next(new AppError("Error generating OTP. Please try again", 500));
-  // }
+    await newUser.save({ validateBeforeSave: false });
+  } catch (error) {
+    console.log(error);
+    return next(new AppError("Error generating OTP. Please try again", 500));
+  }
 
   res.status(201).json({
     status: "success",
