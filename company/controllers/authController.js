@@ -60,7 +60,7 @@ exports.signup = catchAsync(async (req, res, next) => {
       email: newUser.email,
       phone: newUser.phone,
     },
-    sender: "blac",
+    sender: "Dellyman",
     send: true,
     medium: ["whatsapp", "email"],
     expiry: 5,
@@ -114,12 +114,13 @@ exports.login = catchAsync(async (req, res, next) => {
   // check if user exists and password is correct
   const user = await User.findOne({ email }).select("+password"); // { email: email }
 
-  if (user && user.verifiedOTP === false) {
-    return next(
-      new AppError("kindly verify your account before logging in", 400)
-    );
-    // THEN REDIRECT THEM TO GET OTP
-  }
+  // FIX LATERR
+  // if (user && user.verifiedOTP === false) {
+  //   return next(
+  //     new AppError("kindly verify your account before logging in", 400)
+  //   );
+  //   // THEN REDIRECT THEM TO GET OTP
+  // }
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("incorrect email or password", 401));
