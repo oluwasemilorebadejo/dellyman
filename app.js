@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
+const cors = require("cors");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./utils/errorController");
@@ -13,7 +14,11 @@ const adminRouter = require("./admin/adminRoutes");
 
 const app = express();
 
+app.enable("trust proxy");
+
 // middleware
+
+app.use(cors());
 
 // set security http headers
 app.use(
