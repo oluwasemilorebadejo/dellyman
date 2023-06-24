@@ -10,7 +10,7 @@ const globalErrorHandler = require("./utils/errorController");
 
 const companyRouter = require("./company/routes/companyRoutes");
 const jobRouter = require("./company/routes/jobRoutes");
-const adminRouter = require("./admin/adminRoutes");
+const adminRouter = require("./admin/routes/adminRoutes");
 
 const app = express();
 
