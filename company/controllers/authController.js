@@ -198,6 +198,41 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, req, res);
 });
 
+exports.protect = catchAsync(async (req, res, next) => {
+  // get the token and check if it exists
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  if (!token) {
+    return next(
+      new AppError("you arent logged in. kindly log in to get access", 401)
+    );
+  }
+  // verify token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // check if user still exists
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(new AppError("the user with this token no longer exists", 401));
+  }
+  // check if user changed password after token was issued
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(new AppError("user changed password. pls log in again", 401));
+  }
+  // grant access to protected route
+  req.user = currentUser; // req.user stores the user data and is only available on protected routes, ie routes that have the protect middleware
+
+  next();
+});
+
 exports.verifyBvn = catchAsync(async (req, res, next) => {
   const { bvn } = req.body;
   const { role } = req.user;
@@ -233,80 +268,6 @@ exports.uploadCac = catchAsync(async (req, res, next) => {
     status: "success",
     message: "CAC document uploaded, kindly check back for updates",
     user: req.user,
-  });
-});
-
-exports.verifyCac = catchAsync(async (req, res, next) => {
-  let company = await User.findById(req.params.id);
-
-  if (company.role !== "company") {
-    return next(
-      new AppError("this is not user with the provided id isnt a company", 400)
-    );
-  }
-
-  if (company.verifiedBvn === true) {
-    company = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        verifiedCac: true,
-        isVerified: true,
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-  } else {
-    company = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        verifiedCac: true,
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-  }
-
-  // if (company.isVerified === true) {
-  //   const accountReference = uuidv4().replace(/-/g, "").slice(0, 20);
-
-  //   try {
-  //     const response = await axios.post(
-  //       "https://api.flutterwave.com/v3/payout-subaccounts",
-  //       {
-  //         account_name: company.name,
-  //         email: company.email,
-  //         mobilenumber: company.phone,
-  //         country: company.country,
-  //         account_reference: accountReference,
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-  //         },
-  //       }
-  //     );
-
-  //     // console.log(response.data.data);
-
-  //     company.walletId = accountReference;
-  //     company.wallet = response.data.data.nuban;
-  //     company.bank = response.data.data.bank_name;
-  //     await company.save({ validateBeforeSave: false });
-  //   } catch (err) {
-  //     console.error(err);
-  //     return next(new AppError("Error Creating account. pls try again", 500));
-  //   }
-  // }
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      user: company,
-    },
   });
 });
 

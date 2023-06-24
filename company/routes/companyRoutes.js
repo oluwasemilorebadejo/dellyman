@@ -1,7 +1,7 @@
 const express = require("express");
 const companyController = require("../controllers/companyController");
 const authController = require("../controllers/authController");
-const { protect, restrictTo } = require("../../middleware/middleware");
+const { restrictTo } = require("../../middleware/middleware");
 const subscriptionController = require("../controllers/subscriptionController");
 const riderController = require("../../rider/controllers/riderController");
 
@@ -15,7 +15,7 @@ router.patch("/resetPassword/:token", authController.resetPassword);
 
 router.post("/verifyOTP", authController.verifyOTP);
 
-router.use(protect); // applies protect middleware to routes defined after this
+router.use(authController.protect); // applies protect middleware to routes defined after this
 
 router.post("/verify-bvn", authController.verifyBvn);
 router.post("/upload-cac", authController.uploadCac);

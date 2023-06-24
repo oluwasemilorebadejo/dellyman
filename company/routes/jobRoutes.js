@@ -1,14 +1,11 @@
 const express = require("express");
 const jobController = require("../controllers/jobController");
-const {
-  protect,
-  restrictTo,
-  setCompanyId,
-} = require("../../middleware/middleware");
+const { restrictTo, setCompanyId } = require("../../middleware/middleware");
+const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-router.use(protect);
+router.use(authController.protect);
 
 router.use(restrictTo("company"));
 
