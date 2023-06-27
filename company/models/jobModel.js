@@ -15,7 +15,7 @@ const jobSchema = new mongoose.Schema({
   level: {
     type: String,
   },
-  minimunQualification: {
+  minimumQualification: {
     type: String,
   },
   description: {
