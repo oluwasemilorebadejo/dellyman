@@ -19,6 +19,10 @@ const companySchema = new mongoose.Schema({
     type: String,
     validate: [validator.isMobilePhone, "please provide a valid phone number"],
   },
+  organisation: {
+    type: String,
+    required: [true, "pls input name of organisation"],
+  },
   role: {
     type: String,
     enum: {
