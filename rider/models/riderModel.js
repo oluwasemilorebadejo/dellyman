@@ -34,6 +34,13 @@ const riderSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a country"],
   },
+  startDate: {
+    type: Date,
+    required: [true, "kindly enter a date"],
+  },
+  endDate: {
+    type: Date,
+  },
   company: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Company",
