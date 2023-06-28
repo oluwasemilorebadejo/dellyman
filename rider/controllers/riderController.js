@@ -52,32 +52,60 @@ exports.addRider = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.removeRider = catchAsync(async (req, res, next) => {
-  // Find the rider by id
-  const rider = await Rider.findById(req.params.id);
+// exports.removeRider = catchAsync(async (req, res, next) => {
+//   // Find the rider by id
+//   const rider = await Rider.findById(req.params.id);
 
-  // If the rider doesn't exist, return an error
+//   // If the rider doesn't exist, return an error
+//   if (!rider) {
+//     return next(new AppError("Rider not found", 404));
+//   }
+
+//   // Check if the rider belongs to the company
+//   if (rider.company.toString() !== req.user.id) {
+//     return next(
+//       new AppError("You are not authorized to remove this rider", 403)
+//     );
+//   }
+
+//   // Set the end date for the rider
+//   rider.endDate = req.body.endDate; // Set the current date as the end date
+
+//   // Save the changes to the rider document
+//   await rider.save();
+
+//   res.status(200).json({
+//     status: "success",
+//     data: {
+//       message: "Rider removed successfully",
+//     },
+//   });
+// });
+
+exports.updateRider = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const rider = await Rider.findById(id);
+
   if (!rider) {
     return next(new AppError("Rider not found", 404));
   }
 
-  // Check if the rider belongs to the company
   if (rider.company.toString() !== req.user.id) {
     return next(
-      new AppError("You are not authorized to remove this rider", 403)
+      new AppError("You are not authorized to update this rider", 403)
     );
   }
 
-  // Set the end date for the rider
-  rider.endDate = req.body.endDate; // Set the current date as the end date
-
-  // Save the changes to the rider document
-  await rider.save();
+  const updatedRider = await Rider.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
   res.status(200).json({
     status: "success",
     data: {
-      message: "Rider removed successfully",
+      rider: updatedRider,
     },
   });
 });

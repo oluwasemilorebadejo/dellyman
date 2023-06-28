@@ -25,7 +25,7 @@ router
   .post(riderController.addRider)
   .get(riderController.getMyRiders);
 
-router.route("/rider/:id").patch(riderController.removeRider);
+router.route("/rider/:id").patch(riderController.updateRider);
 
 router.get("/plans", subscriptionController.getAllPlans);
 
