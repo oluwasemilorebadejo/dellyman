@@ -16,10 +16,7 @@ exports.createJob = catchAsync(async (req, res, next) => {
 
   const newJob = await Job.create({
     company: req.body.company,
-    description,
-    requirements,
-    location,
-    salary,
+    ...req.body,
   });
 
   res.status(201).json({

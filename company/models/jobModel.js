@@ -6,11 +6,9 @@ const jobSchema = new mongoose.Schema({
     ref: "Company",
     required: true,
   },
-  role: {
+  title: {
     type: String,
-    // required: true,
-    enum: ["rider"],
-    message: "Role not allowed. Role must be rider",
+    required: [true, "kindly enter job title"],
   },
   level: {
     type: String,
@@ -20,28 +18,24 @@ const jobSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    // required: true,
-  },
-  summary: {
-    type: String,
+    required: [true, "pls enter the job description"],
   },
   requirements: {
     type: [String],
-    // required: true,
-  },
-  ageRange: {
-    type: String,
+    required: [true, "pls enter the job requirements"],
   },
   location: {
     type: String,
-    // required: true,
+    required: [true, "pls enter the location"],
   },
   experience: {
     type: String,
+    required: [true, "pls enter the job experience"],
+    enum: ["none", "1-3", "5+"],
   },
   salary: {
     type: Number,
-    // required: true,
+    required: [true, "pls enter the exact salary or salary range"],
   },
   createdAt: {
     type: Date,
