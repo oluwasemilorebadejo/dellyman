@@ -13,8 +13,22 @@ const jobSchema = new mongoose.Schema({
   level: {
     type: String,
   },
+  type: {
+    type: String,
+    required: [true, "kindly enter job type"],
+    enum: ["full time", "contract", "part time", "internship"],
+    message: "Job type not allowed.",
+  },
   minimumQualification: {
     type: String,
+    enum: [
+      "none",
+      "primary education",
+      "secondary education",
+      "bachelors",
+      "masters",
+      "PhD",
+    ],
   },
   description: {
     type: String,
