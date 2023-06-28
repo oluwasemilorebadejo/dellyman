@@ -16,15 +16,8 @@ const signToken = (id) =>
 const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
-  const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true, // cant manipulate cookie in any way ie cant delete the cookie
-    secure: req.secure,
-  };
-
-  res.cookie("jwt", token, cookieOptions);
+  // Set the Authorization header with the token
+  res.set("Authorization", `Bearer ${token}`);
 
   user.password = undefined;
 
@@ -200,15 +193,13 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
-  // get the token and check if it exists
+  // Get the token from the Authorization header
   let token;
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
-  } else if (req.cookies.jwt) {
-    token = req.cookies.jwt;
   }
 
   if (!token) {
