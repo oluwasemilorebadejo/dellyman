@@ -14,6 +14,10 @@
     {
       "src": "/(.*)",
       "dest": "server.js"
+    },
+    {
+      "src": "/_vercel_keep_alive",
+      "dest": "server.js"
     }
   ]
 }
