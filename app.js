@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
 const cors = require("cors");
+const compression = require("compression");
 const Admin = require("./admin/models/adminModel");
 
 const AppError = require("./utils/appError");
@@ -37,6 +38,8 @@ app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
 app.use(mongoSanitize());
+
+app.use(compression());
 
 // routes
 
