@@ -18,6 +18,7 @@ mongoose
   .connect(DB, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    minPoolSize: 15,
   })
   .then(() => console.log("DB connection sucessfull"));
 
