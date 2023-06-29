@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
 const cors = require("cors");
+const Admin = require("./admin/models/adminModel");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./utils/errorController");
@@ -28,9 +29,8 @@ app.use(
 );
 
 // log env variable
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
+app.use(morgan("dev"));
+
 console.log(`ENVIROMENT: ${process.env.NODE_ENV}`);
 
 app.use(express.json({ limit: "10kb" }));
@@ -44,8 +44,19 @@ app.use("/api/v1/users/company", companyRouter);
 app.use("/api/v1/jobs", jobRouter);
 app.use("/api/v1/admin", adminRouter);
 
-app.use("/", (req, res) => {
+app.use("/test", (req, res) => {
   res.status(200).json({ message: "Hello, world!" });
+});
+
+app.use("/test-db", async (req, res) => {
+  const admin = await Admin.find();
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      admin,
+    },
+  });
 });
 
 app.all("*", (req, res, next) => {
