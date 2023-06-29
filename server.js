@@ -28,11 +28,6 @@ const server = app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
 
-// Keep Alive route
-app.get("/_vercel_keep_alive", (req, res) => {
-  res.status(200).send("Vercel Serverless Function is alive!");
-});
-
 process.on("unhandledRejection", (err) => {
   console.log("UNHANDLED REJECTION, SHUTTING DOWN...");
   console.log(err.name, err.message);

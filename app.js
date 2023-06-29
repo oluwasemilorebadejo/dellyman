@@ -59,6 +59,11 @@ app.use("/test-db", async (req, res) => {
   });
 });
 
+// Keep Alive route
+app.get("/_vercel_keep_alive", (req, res) => {
+  res.status(200).send("Vercel Serverless Function is alive!");
+});
+
 app.all("*", (req, res, next) => {
   next(new AppError(`cant find ${req.originalUrl}`, 404));
 });
