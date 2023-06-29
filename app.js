@@ -44,6 +44,10 @@ app.use("/api/v1/users/company", companyRouter);
 app.use("/api/v1/jobs", jobRouter);
 app.use("/api/v1/admin", adminRouter);
 
+app.use("/", (req, res) => {
+  res.status(200).json({ message: "Hello, world!" });
+});
+
 app.all("*", (req, res, next) => {
   next(new AppError(`cant find ${req.originalUrl}`, 404));
 });
