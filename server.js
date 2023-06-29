@@ -29,6 +29,26 @@ const server = app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
 
+// Send keep-alive requests every 5 minutes
+const keepAliveInterval = setInterval(() => {
+  mongoose.connection.db.admin().ping((error) => {
+    if (error) {
+      console.error("Failed to send keep-alive request:", error);
+    } else {
+      console.log("Keep-alive request sent to MongoDB");
+    }
+  });
+}, 5 * 60 * 1000);
+
+// Close the keep-alive interval and the MongoDB connection when the application is terminated or finished
+process.on("SIGINT", () => {
+  clearInterval(keepAliveInterval);
+  mongoose.connection.close(() => {
+    console.log("MongoDB connection closed");
+    process.exit(0);
+  });
+});
+
 process.on("unhandledRejection", (err) => {
   console.log("UNHANDLED REJECTION, SHUTTING DOWN...");
   console.log(err.name, err.message);
