@@ -89,7 +89,10 @@ const companySchema = new mongoose.Schema({
   country: {
     type: String,
     required: [true, "pls enter your country code"],
-    enum: ["NG", "GH"],
+    enum: {
+      values: ["NG", "GH"],
+      message: "Country not allowed. Country code must be NG or GH",
+    },
   },
   otp: {
     type: String,
@@ -99,9 +102,11 @@ const companySchema = new mongoose.Schema({
   },
   plan: {
     type: String,
-    enum: ["free", "basic", "premium"],
-    default: "free",
-    message: "Plan not allowed. Plan must be free, basic or premium",
+    enum: {
+      values: ["free", "basic", "premium"],
+      default: "free",
+      message: "Plan not allowed. Plan must be free, basic or premium",
+    },
   },
   points: {
     type: Number,
