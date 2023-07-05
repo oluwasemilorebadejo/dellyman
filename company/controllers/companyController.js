@@ -68,7 +68,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 exports.getUser = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.id);
   if (!user) {
-    return next(new AppError("invalid id", 404));
+    return next(new AppError("user doesnt exist", 404));
   }
 
   res.status(200).json({
@@ -80,7 +80,9 @@ exports.getUser = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
-  await User.findByIdAndUpdate(req.user.id, { active: false });
+  if (!req.params.id) return next(new AppError("user doesnt exists", 400));
+
+  await User.findByIdAndUpdate(req.params.id, { active: false });
 
   res.status(204).json({
     status: "success",
