@@ -114,8 +114,6 @@ const companySchema = new mongoose.Schema({
   },
 });
 
-// once Company verifies otp, set active to true
-
 companySchema.pre("save", async function (next) {
   // function runs only if password is modified
   if (!this.isModified("password")) return next();

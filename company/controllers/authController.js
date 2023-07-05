@@ -7,6 +7,7 @@ const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../../utils/appError");
 const sendEmail = require("../../utils/email");
 const axios = require("axios");
+const cloudinary = require("../../middleware/cloudinary");
 
 const signToken = (id) =>
   jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -16,15 +17,8 @@ const signToken = (id) =>
 const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
-  const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true, // cant manipulate cookie in any way ie cant delete the cookie
-    secure: req.secure,
-  };
-
-  res.cookie("jwt", token, cookieOptions);
+  // Set the Authorization header with the token
+  res.set("Authorization", `Bearer ${token}`);
 
   user.password = undefined;
 
@@ -200,15 +194,13 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
-  // get the token and check if it exists
+  // Get the token from the Authorization header
   let token;
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
-  } else if (req.cookies.jwt) {
-    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -258,17 +250,34 @@ exports.verifyBvn = catchAsync(async (req, res, next) => {
 });
 
 exports.uploadCac = catchAsync(async (req, res, next) => {
-  const { cac } = req.body;
-  const { role } = req.user;
+  // console.log(req.file);
+  const { role, id } = req.user;
 
-  if (role === "company" && !cac) {
+  if (role !== "company") {
+    return next(new AppError("only company can upload cac", 403));
+  }
+
+  if (!req.file) {
     return next(new AppError("Please provide CAC for verification", 400));
   }
+
+  const result = await cloudinary.uploader.upload(req.file.path, {
+    // public_id: req.file.filename,
+    use_filename: true,
+  });
+
+  const updatedUser = await User.findByIdAndUpdate(
+    id,
+    { cac: result.url },
+    { new: true, runValidators: true }
+  );
+
+  // console.log(result);
 
   res.status(200).json({
     status: "success",
     message: "CAC document uploaded, kindly check back for updates",
-    user: req.user,
+    user: updatedUser,
   });
 });
 
