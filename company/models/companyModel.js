@@ -158,7 +158,7 @@ companySchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 };
 
 companySchema.methods.createPasswordResetToken = function () {
-  const resetToken = crypto.randomBytes(32).toString("hex");
+  const resetToken = Math.floor(1000000 + Math.random() * 9000000).toString();
 
   this.passwordResetToken = crypto
     .createHash("sha256")
