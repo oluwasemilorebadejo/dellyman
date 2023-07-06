@@ -68,7 +68,12 @@ app.get("/_vercel_keep_alive", (req, res) => {
 });
 
 app.all("*", (req, res, next) => {
-  next(new AppError(`cant find ${req.originalUrl}`, 404));
+  next(
+    new AppError(
+      `Cannot find ${req.originalUrl}. This endpoint does not exist.`,
+      404
+    )
+  );
 });
 
 app.use(globalErrorHandler);
