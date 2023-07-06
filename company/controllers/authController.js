@@ -141,7 +141,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 3) Send it to user's email
   const resetURL = `${req.protocol}://${req.get(
     "host"
-  )}/api/v1/users/resetPassword`;
+  )}/api/v1/users/company/resetPassword`;
 
   const message = `Forgot your password? Reset your password using the link: ${resetURL}. Your otp reset token is ${resetToken}. \nIf you didn't forget your password, please ignore this email!`;
 
