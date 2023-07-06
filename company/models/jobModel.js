@@ -12,23 +12,33 @@ const jobSchema = new mongoose.Schema({
   },
   level: {
     type: String,
+    enum: {
+      values: ["entry", "mid", "senior"],
+      message: "Job level not allowed.",
+    },
   },
   type: {
     type: String,
     required: [true, "kindly enter job type"],
-    enum: ["full time", "contract", "part time", "internship"],
-    message: "Job type not allowed.",
+    enum: {
+      values: ["full time", "contract", "part time", "internship"],
+      message: "Job type not allowed.",
+    },
   },
   minimumQualification: {
     type: String,
-    enum: [
-      "none",
-      "primary education",
-      "secondary education",
-      "bachelors",
-      "masters",
-      "PhD",
-    ],
+    enum: {
+      values: [
+        "none",
+        "primary education",
+        "secondary education",
+        "bachelors",
+        "masters",
+        "PhD",
+      ],
+      message:
+        "Qualification not allowed. Must be none or primary education or secondary education or bachelors or masters or PhD",
+    },
   },
   description: {
     type: String,
@@ -50,6 +60,13 @@ const jobSchema = new mongoose.Schema({
   salary: {
     type: Number,
     required: [true, "pls enter the exact salary or salary range"],
+  },
+  deadline: {
+    type: Date,
+    required: [
+      true,
+      "pls enter the deadline. must be a date in the form YYYY-MM-DD",
+    ],
   },
   createdAt: {
     type: Date,
