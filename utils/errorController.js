@@ -2,7 +2,7 @@ const AppError = require("../utils/appError");
 
 const handleCastErrorDB = (err) => {
   // still handling the invalid id err
-  const message = `Invalid ${err.path}: ${err.value}. Please provide a valid value.`;
+  const message = `Invalid ${err.path}: ${err.value}. Please provide a valid value. Value should be a ${err.kind}`;
   return new AppError(message, 400);
 };
 
@@ -18,6 +18,16 @@ const handleDuplicateFieldsDB = (err) => {
 const handleValidationErrorDB = (err) => {
   const errors = Object.values(err.errors).map((el) => el.message);
   const message = `Invalid input data. ${errors.join(". ")}`;
+  return new AppError(message, 400);
+};
+
+const handleValidationCastErrorDB = (err) => {
+  const errors = Object.values(err.errors).map((error) => {
+    const { path, kind, value, valueType } = error;
+    return `${path} field expected value of ${kind} but got value ${value} which is a ${valueType}`;
+  });
+
+  const message = errors.join(". ");
   return new AppError(message, 400);
 };
 
@@ -54,20 +64,6 @@ const sendErrorProd = (err, req, res) => {
       message: "something went wrong",
     });
   }
-  // (B) SSRendered
-  if (err.isOperational) {
-    return res.status(err.statusCode).render("error", {
-      title: "Something went wrong",
-      msg: err.message,
-    });
-  }
-  // programming errors, dont send details to client
-  console.error("ERROR", err);
-
-  return res.status(err.statusCode).render("error", {
-    title: "Something went wrong",
-    msg: "pls try again later",
-  });
 };
 
 module.exports = (err, req, res, next) => {
@@ -82,7 +78,14 @@ module.exports = (err, req, res, next) => {
 
     if (err.name === "CastError") err = handleCastErrorDB(err);
     if (err.code === 11000) err = handleDuplicateFieldsDB(err);
-    if (err.name === "ValidationError") err = handleValidationErrorDB(err);
+    if (err.name === "ValidationError") {
+      if (err.message.includes("Cast")) {
+        err = handleValidationCastErrorDB(err);
+      } else {
+        err = handleValidationErrorDB(err);
+      }
+    }
+
     if (err.name === "JsonWebTokenError") err = handleJWTErr(err);
     if (err.name === "TokenExpiredError") err = handleJWTExpiredErr(err);
     sendErrorProd(err, req, res);
