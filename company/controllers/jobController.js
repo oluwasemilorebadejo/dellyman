@@ -34,6 +34,7 @@ exports.getMyJobs = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
+    totalJobs: jobs.length,
     data: {
       jobs,
     },
