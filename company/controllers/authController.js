@@ -192,9 +192,12 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
 
-  // 3) Update changedPasswordAt property for the user
-  // 4) Log the user in, send JWT
-  createSendToken(user, 200, req, res);
+  // 3) Update changedPasswordAt property for the user -> done in the company model
+  // 4) send descriptive message to user
+  res.status(200).json({
+    status: "success",
+    message: "password has been reset. kindly log in with your new password",
+  });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
