@@ -104,9 +104,9 @@ const companySchema = new mongoose.Schema({
     type: String,
     enum: {
       values: ["free", "basic", "premium"],
-      default: "free",
       message: "Plan not allowed. Plan must be free, basic or premium",
     },
+    default: "free",
   },
   points: {
     type: Number,
