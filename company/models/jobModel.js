@@ -73,6 +73,10 @@ const jobSchema = new mongoose.Schema({
       "pls enter the deadline. must be a date in the format YYYY-MM-DD",
     ],
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const Job = mongoose.model("Job", jobSchema);
