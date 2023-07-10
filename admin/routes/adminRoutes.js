@@ -29,9 +29,6 @@ router.get("/users/company", companyController.getAllUsers);
 router.get("/users/company/:id", companyController.getUser);
 router.delete("/users/company/:id", companyController.deleteUser);
 
-// Authentication routes
-router.patch("/users/company/verify-cac/:id", authController.verifyCac);
-
 // test deleted user and make sure they cant login after, also verify the companies by cac
 
 module.exports = router;
