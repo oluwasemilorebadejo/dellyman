@@ -55,7 +55,7 @@ exports.signup = catchAsync(async (req, res, next) => {
       email: newUser.email,
       phone: newUser.phone,
     },
-    sender: "Dellyman",
+    sender: "Rider's Institute",
     send: true,
     medium: ["whatsapp", "email"],
     expiry: 5,
@@ -75,10 +75,10 @@ exports.signup = catchAsync(async (req, res, next) => {
     const response = await axios(config);
 
     const otpData = response.data.data;
-    const smsOtpData = otpData.find((item) => item.medium === "email");
+    const emailOtpData = otpData.find((item) => item.medium === "email");
 
-    const otpReference = smsOtpData.reference;
-    const otp = smsOtpData.otp;
+    const otpReference = emailOtpData.reference;
+    const otp = emailOtpData.otp;
 
     newUser.otp = otp;
     newUser.otpReference = otpReference;
@@ -109,13 +109,13 @@ exports.login = catchAsync(async (req, res, next) => {
   // check if user exists and password is correct
   const user = await User.findOne({ email }).select("+password"); // { email: email }
 
-  // FIX LATERR
-  // if (user && user.verifiedOTP === false) {
-  //   return next(
-  //     new AppError("kindly verify your account before logging in", 400)
-  //   );
-  //   // THEN REDIRECT THEM TO GET OTP
-  // }
+  // Check if user has verified OTP
+  if (user && user.verifiedOTP === false) {
+    return next(
+      new AppError("kindly verify your account before logging in", 400)
+    );
+    // THEN REDIRECT THEM TO GET OTP
+  }
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("incorrect email or password", 401));
@@ -289,6 +289,14 @@ exports.uploadCac = catchAsync(async (req, res, next) => {
 });
 
 exports.generateOTP = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  const newUser = await User.findOne({ email }); // { email: email }
+
+  if (newUser.verifiedOTP) {
+    return next(new AppError("account already verified, kindly login", 400));
+  }
+
   // send OTP
   const data = JSON.stringify({
     length: 7,
@@ -297,7 +305,7 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
       email: newUser.email,
       phone: newUser.phone,
     },
-    sender: "blac",
+    sender: "Rider's Institute",
     send: true,
     medium: ["whatsapp", "email"],
     expiry: 5,
@@ -317,10 +325,10 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
     const response = await axios(config);
 
     const otpData = response.data.data;
-    const smsOtpData = otpData.find((item) => item.medium === "email");
+    const emailOtpData = otpData.find((item) => item.medium === "email");
 
-    const otpReference = smsOtpData.reference;
-    const otp = smsOtpData.otp;
+    const otpReference = emailOtpData.reference;
+    const otp = emailOtpData.otp;
 
     newUser.otp = otp;
     newUser.otpReference = otpReference;
@@ -331,7 +339,13 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
     return next(new AppError("Error generating OTP. Please try again", 500));
   }
 
-  next();
+  res.status(200).json({
+    status: "success",
+    data: {
+      message: "OTP has been sent. Kindly check your email",
+      user: newUser,
+    },
+  });
 });
 
 exports.verifyOTP = catchAsync(async (req, res, next) => {
@@ -371,8 +385,6 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
       currentUser.otp = undefined;
 
       await currentUser.save({ validateBeforeSave: false });
-    } else {
-      return next(new AppError("invalid otp", 400));
     }
 
     res.status(201).json({
@@ -382,7 +394,13 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.log(error);
-    return next(new AppError("something went wrong. pls try again"));
+    if (
+      error.response.data.status === "error" &&
+      error.response.data.message.includes("not found")
+    )
+      return next(new AppError("otp has expired. pls generate a new one", 400));
+    else {
+      return next(new AppError("something went wrong", 500));
+    }
   }
 });
