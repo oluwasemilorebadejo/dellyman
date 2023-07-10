@@ -27,9 +27,9 @@ const companySchema = new mongoose.Schema({
     type: String,
     enum: {
       values: ["company"],
-      default: "company",
       message: "User role not allowed. Role must be company",
     },
+    default: "company",
   },
   password: {
     type: String,
