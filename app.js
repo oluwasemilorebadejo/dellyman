@@ -5,7 +5,6 @@ const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
 const cors = require("cors");
 const compression = require("compression");
-const Admin = require("./admin/models/adminModel");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./utils/errorController");
@@ -13,6 +12,7 @@ const globalErrorHandler = require("./utils/errorController");
 const companyRouter = require("./company/routes/companyRoutes");
 const jobRouter = require("./company/routes/jobRoutes");
 const adminRouter = require("./admin/routes/adminRoutes");
+const riderRouter = require("./rider/routes/riderRoutes");
 
 const app = express();
 
@@ -46,6 +46,7 @@ app.use(compression());
 app.use("/api/v1/users/company", companyRouter);
 app.use("/api/v1/jobs", jobRouter);
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/users/rider", riderRouter);
 
 app.use("/test", (req, res) => {
   res.status(200).json({ message: "Hello, world!" });
