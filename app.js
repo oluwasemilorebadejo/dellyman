@@ -51,17 +51,6 @@ app.use("/test", (req, res) => {
   res.status(200).json({ message: "Hello, world!" });
 });
 
-app.use("/test-db", async (req, res) => {
-  const admin = await Admin.find();
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      admin,
-    },
-  });
-});
-
 // Keep Alive route
 app.get("/_vercel_keep_alive", (req, res) => {
   res.status(200).send("Vercel Serverless Function is alive!");
