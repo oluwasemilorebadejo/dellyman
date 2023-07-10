@@ -1,6 +1,7 @@
 const Job = require("../models/jobModel");
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../../utils/appError");
+const APIFeatures = require("../../utils/apiFeatures");
 
 exports.createJob = catchAsync(async (req, res, next) => {
   const { description, requirements, location, salary } = req.body;
@@ -30,7 +31,13 @@ exports.createJob = catchAsync(async (req, res, next) => {
 exports.getMyJobs = catchAsync(async (req, res, next) => {
   const companyId = req.user.id; // Assuming the authenticated user has a "company" property that holds the reference to the company
 
-  const jobs = await Job.find({ company: companyId });
+  const features = new APIFeatures(Job.find({ company: companyId }), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+
+  const jobs = await features.query;
 
   res.status(200).json({
     status: "success",
