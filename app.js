@@ -29,7 +29,7 @@ app.use(
   })
 );
 
-if (process.env.NODE_ENV === development) app.use(morgan("dev"));
+if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
 // log env variable
 console.log(`ENVIROMENT: ${process.env.NODE_ENV}`);
