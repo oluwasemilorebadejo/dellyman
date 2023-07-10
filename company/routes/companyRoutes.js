@@ -14,6 +14,7 @@ router.post("/login", authController.login);
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword", authController.resetPassword);
 
+router.post("/generate-otp", authController.generateOTP);
 router.post("/verifyOTP", authController.verifyOTP);
 
 router.use(authController.protect); // applies protect middleware to routes defined after this
